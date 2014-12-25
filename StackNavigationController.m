@@ -148,4 +148,39 @@
     [self performSelector:@selector(runNextTask) withObject:nil afterDelay:0.0f];
 }
 
+
+// forward other delegate method to customDelegate
+
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+    [self.customDelegate navigationController:navigationController willShowViewController:viewController animated:animated];
+}
+
+- (NSUInteger)navigationControllerSupportedInterfaceOrientations:(UINavigationController *)navigationController
+{
+    return [self.customDelegate navigationControllerSupportedInterfaceOrientations:navigationController];
+}
+
+- (UIInterfaceOrientation)navigationControllerPreferredInterfaceOrientationForPresentation:(UINavigationController *)navigationController
+{
+    return [self.customDelegate navigationControllerPreferredInterfaceOrientationForPresentation:navigationController];
+}
+
+- (id <UIViewControllerInteractiveTransitioning>)navigationController:(UINavigationController *)navigationController
+                          interactionControllerForAnimationController:(id <UIViewControllerAnimatedTransitioning>) animationController
+{
+    return [self.customDelegate navigationController:navigationController interactionControllerForAnimationController:animationController];
+}
+
+- (id <UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
+                                   animationControllerForOperation:(UINavigationControllerOperation)operation
+                                                fromViewController:(UIViewController *)fromVC
+                                                  toViewController:(UIViewController *)toVC
+{
+    return [self.customDelegate navigationController:navigationController
+              animationControllerForOperation:operation
+                           fromViewController:fromVC
+                             toViewController:toVC];
+}
+
 @end
