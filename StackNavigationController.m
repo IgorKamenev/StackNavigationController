@@ -21,7 +21,7 @@
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-
+    
     if (self.delegate) {
         self.customDelegate = self.delegate;
     }
@@ -43,7 +43,7 @@
 
 
 - (void) pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
-
+    
     @synchronized(self.tasks) {
         if (self.isTransitioning) {
             
@@ -70,7 +70,7 @@
             };
             
             [self.tasks addObject:task];
-      
+            
             return nil;
             
         } else {
@@ -123,7 +123,7 @@
 }
 
 - (void) runNextTask {
-
+    
     @synchronized(self.tasks) {
         if (self.tasks.count) {
             void (^task)(void) = self.tasks[0];
@@ -139,7 +139,7 @@
 {
     self.isTransitioning = NO;
     
-    if (self.customDelegate) {
+    if ([self.customDelegate respondsToSelector:@selector(navigationController:didShowViewController:animated:)]) {
         [self.customDelegate navigationController:navigationController didShowViewController:viewController animated:animated];
     }
     
@@ -153,23 +153,35 @@
 
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
-    [self.customDelegate navigationController:navigationController willShowViewController:viewController animated:animated];
+    if ([self.customDelegate respondsToSelector:@selector(navigationController:willShowViewController:animated:)]) {
+        [self.customDelegate navigationController:navigationController willShowViewController:viewController animated:animated];
+    }
 }
 
 - (NSUInteger)navigationControllerSupportedInterfaceOrientations:(UINavigationController *)navigationController
 {
-    return [self.customDelegate navigationControllerSupportedInterfaceOrientations:navigationController];
+    if ([self.customDelegate respondsToSelector:@selector(navigationControllerSupportedInterfaceOrientations:)]) {
+        return [self.customDelegate navigationControllerSupportedInterfaceOrientations:navigationController];
+    }
+    return 0;
 }
 
 - (UIInterfaceOrientation)navigationControllerPreferredInterfaceOrientationForPresentation:(UINavigationController *)navigationController
 {
-    return [self.customDelegate navigationControllerPreferredInterfaceOrientationForPresentation:navigationController];
+    if ([self.customDelegate respondsToSelector:@selector(navigationControllerPreferredInterfaceOrientationForPresentation:)]) {
+        return [self.customDelegate navigationControllerPreferredInterfaceOrientationForPresentation:navigationController];
+    }
+    
+    return UIInterfaceOrientationUnknown;
 }
 
 - (id <UIViewControllerInteractiveTransitioning>)navigationController:(UINavigationController *)navigationController
                           interactionControllerForAnimationController:(id <UIViewControllerAnimatedTransitioning>) animationController
 {
-    return [self.customDelegate navigationController:navigationController interactionControllerForAnimationController:animationController];
+    if ([self.customDelegate respondsToSelector:@selector(navigationController:interactionControllerForAnimationController:)]) {
+        return [self.customDelegate navigationController:navigationController interactionControllerForAnimationController:animationController];
+    }
+    return nil;
 }
 
 - (id <UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
@@ -177,10 +189,13 @@
                                                 fromViewController:(UIViewController *)fromVC
                                                   toViewController:(UIViewController *)toVC
 {
-    return [self.customDelegate navigationController:navigationController
-              animationControllerForOperation:operation
-                           fromViewController:fromVC
-                             toViewController:toVC];
+    if ([self.customDelegate respondsToSelector:@selector(navigationController:animationControllerForOperation:fromViewController:toViewController:)]) {
+        return [self.customDelegate navigationController:navigationController
+                         animationControllerForOperation:operation
+                                      fromViewController:fromVC
+                                        toViewController:toVC];
+    }
+    return nil;
 }
 
 @end
