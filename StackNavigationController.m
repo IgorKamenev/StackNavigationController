@@ -109,7 +109,6 @@
                 [self popToRootViewControllerAnimated:animated];
             };
             
-            [self.tasks removeAllObjects];
             [self.tasks addObject:task];
             
             return nil;
