@@ -30,6 +30,8 @@
     self.tasks = [NSMutableArray new];
 }
 
+// we should save navController.delegate to another property because we need delegate
+// to prevent multiple push/pop bug
 -(void)setDelegate:(id<UINavigationControllerDelegate>)delegate
 {
     if (delegate == self) {
@@ -141,6 +143,8 @@
         [self.customDelegate navigationController:navigationController didShowViewController:viewController animated:animated];
     }
     
+    // black magic :)
+    // if one of push/pop will be without animation - we should place this code to the end of runLoop to prevent bad behavior
     [self performSelector:@selector(runNextTask) withObject:nil afterDelay:0.0f];
 }
 
